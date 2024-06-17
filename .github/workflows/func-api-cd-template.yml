@@ -16,6 +16,10 @@ on:
         description: 'Function App Resource Group'
         required: true
         type: string
+      apimGateway:
+        description: 'API Management Service Name'
+        required: true
+        type: string
       artifactName:
         description: 'Artifact Name'
         required: true
