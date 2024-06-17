@@ -7,27 +7,27 @@ on:
       environment:
         description: 'Environment to deploy to'
         required: true
-        types: string
+        type: string
       functionAppName:
         description: 'Function App Name'
         required: true
-        types: string
+        type: string
       appSettings:
         description: 'Function App Resource Group'
         required: true
-        types: string
+        type: string
       artifactName:
         description: 'Artifact Name'
         required: true
-        types: string
+        type: string
       appFolder:
         description: 'App Folder'
         required: true
-        types: string
+        type: string
       buildNumber:
         description: 'Build Number'
         required: true
-        types: string
+        type: string
     secrets:
       AZURE_CLIENT_ID:
         required: true
