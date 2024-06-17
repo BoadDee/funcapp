@@ -74,7 +74,7 @@ jobs:
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPI.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -func ${{ inputs.functionAppName }}  -product 'Rayobeam'
+            ${{ github.workspace }}/${{ inputs.appFolder }}/CreateAPI.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -func ${{ inputs.functionAppName }}  -product 'Rayobeam'
           azPSVersion: "latest"
       
       - name: 'Create Swagger'
