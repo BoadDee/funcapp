@@ -69,7 +69,7 @@ jobs:
       - name: 'Set Function App Settings'
         shell: pwsh
         run: |
-          $instrumentationKey = az resource show -g rg-dre-cac -n appi-dre-cac --resource-type "microsoft.insights/components" --query properties.instrumentationKey
+          $instrumentationKey = az resource show -g rg-dre-cac -n appi-dre-cac --resource-type "microsoft.insights/components" --query properties.InstrumentationKey
           $filepath = "${{ github.workspace }}/${{ inputs.appFolder }}/${{ inputs.appSettings}}"
           $json = Get-Content $filepath | Out-String | ConvertFrom-Json
           $instrumentationKey = $instrumentationKey.replace('"', '')
