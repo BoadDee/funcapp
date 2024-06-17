@@ -78,7 +78,7 @@ jobs:
           $json | ConvertTo-Json -Depth 10 | Set-Content $filepath
 
           az account show
-          az functionapp config appsettings set --name ${{ inputs.functionAppName }} --resource-group ${{ inputs.functionRg }}
+          az functionapp config appsettings set -g rg-dre-cac -n ${{ inputs.functionAppName }} --settings '@${{ github.workspace }}/${{ inputs.appFolder }}/${{ inputs.appSettings }}'
 
       - name: 'Setup python 3.10'
         uses: actions/setup-python@v4
