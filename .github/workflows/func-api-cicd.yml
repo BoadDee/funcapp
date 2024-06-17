@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python-app-api-${{ github.run_number }}
-          path: code
+          path: code/function_app
       
       - name: 'Upload Artifact for APIM deployment'
         uses: actions/upload-artifact@v3
