@@ -118,3 +118,4 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.appFolder }}
           func azure functionapp publish ${{ inputs.functionAppName }} --python
+        continue-on-error: true
