@@ -1,0 +1,77 @@
+
+name: dre-api-workflow
+
+on:
+  push:
+    branches:
+      - main
+
+    paths:
+      - 'code/**'
+      - '.github/workflows/**'
+    
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+  issues: read
+  checks: write
+  pull_request: write
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-app-api-${{ github.run_number }}
+          path: code
+      
+      - name: 'Upload Artifact for APIM deployment'
+        uses: actions/upload-artifact@v3
+        with:
+          name: scripts-${{ github.run_number }}
+          path: .github/workflows/scripts
+
+
+  deploy-de:
+    uses: ./.github/workflows/func-api-cd-template.yml
+    needs: build
+    with:
+      environment: de
+      functionAppName: func-dre-api
+      appSettings: app.settings.json
+      apimGateway: https://apim-dre.azure-api.net
+      artifactName: python-app-api
+      appFolder: code/function_app
+      buildNumber: '${{ github.run_number }}'
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  deploy-de-apim:
+    uses: ./.github/workflows/func-cd-template-apim.yml
+    needs: deploy-de
+    with:
+      environment: de
+      functionAppName: func-dre-api
+      functionRg: rg-dre-cac
+      apim: apim-dre
+      apimRg: rg-dre-cac
+      artifactName: scripts
+      appFolder: scripts
+      buildNumber: '${{ github.run_number }}'
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

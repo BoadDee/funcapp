@@ -1,0 +1,106 @@
+
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        types: string
+      functionAppName:
+        description: 'Function App Name'
+        required: true
+        types: string
+      functionRg:
+        description: 'Function App Resource Group'
+        required: true
+        types: string
+      apim:
+        description: 'API Management Service Name'
+        required: true
+        types: string
+      apimRg:
+        description: 'API Management Resource Group'
+        required: true
+        types: string
+      artifactName:
+        description: 'Artifact Name'
+        required: true
+        types: string
+      appFolder:
+        description: 'App Folder'
+        required: true
+        types: string
+      buildNumber:
+        description: 'Build Number'
+        required: true
+        types: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+permissions:
+  contents: read
+  id-token: write
+        
+jobs:
+  deploy:
+    name: 'APIM-${{ inputs.environment }}-release'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Download Build artifactName
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName }}-${{ inputs.buildNumber }}
+          path: ${{ github.workspace }}/${{ inputs.appFolder }}
+      
+      - name: Test Artifact Download
+        run: ls -R
+      
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Create API
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPI.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -func ${{ inputs.functionAppName }}  -product 'Rayobeam'
+          azPSVersion: "latest"
+      
+      - name: 'Create Swagger'
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            ${{ github.workspace }}/$ {{ inputs.appFolder }}/GenerateSwagger.ps1 -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -sunscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azPSVersion: "latest"
+
+      - name: 'Create API version'
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPIVersion.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }} -rg ${{ inputs.functionRg }}
+          azPSVersion: "latest"
+
+      - name: 'Import API'
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            ${{ github.workspace }}/$ {{ inputs.appFolder }}/ImportAPIDefinition.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -openApiJson '${{ github.workspace }}/swagger.json' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }}
+          azPSVersion: "latest"
+
+      - name: 'Create Api backend'
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPIBackend.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }} -policyxml '${{ github.workspace }}/$ {{ inputs.appFolder }}/apim-policy.xml' -api 'dre-api-${{ inputs.environment }}'
+          azPSVersion: "latest"

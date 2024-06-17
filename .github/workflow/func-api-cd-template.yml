@@ -1,0 +1,110 @@
+
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        types: string
+      functionAppName:
+        description: 'Function App Name'
+        required: true
+        types: string
+      appSettings:
+        description: 'Function App Resource Group'
+        required: true
+        types: string
+      artifactName:
+        description: 'Artifact Name'
+        required: true
+        types: string
+      appFolder:
+        description: 'App Folder'
+        required: true
+        types: string
+      buildNumber:
+        description: 'Build Number'
+        required: true
+        types: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: '${{ inputs.environment }}-release'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Download Build artifactName
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName }}-${{ inputs.buildNumber }}
+          path: ${{ github.workspace }}/${{ inputs.appFolder }}
+      
+      - name: 'Test Artifact Download'
+        run: ls -R
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: 'Set Function App Settings'
+        shell: pwsh
+        run: |
+          $instrumentationKey = az resource show -g rg-dre-cac -n appi-dre-cac --resource-type "microsoft.insights/components" --query properties.instrumentationKey
+          $filepath = "${{ github.workspace }}/${{ inputs.appFolder }}/${{ inputs.appSettings}}"
+          $json = Get-Content $filepath | Out-String | ConvertFrom-Json
+          $instrumentationKey = $instrumentationKey.replace('"', '')
+          $json |%{ $_.value = $_.value.replace('<<INSTRUMENTATION_KEY>>', $instrumentationKey) 
+          $_.value = $_.value.replace('<<ENVIRONMENT>>', '${{ inputs.environment }}'') }
+          $json | ConvertTo-Json -Depth 10 | Set-Content $filepath
+
+          az account show
+          az functionapp config appsettings set --name ${{ inputs.functionAppName }} --resource-group ${{ inputs.functionRg }}
+
+      - name: 'Setup python 3.10'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 'Install dependencies'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ${{ github.workspace }}/${{ inputs.appFolder }}/requirements.txt
+
+      - name: 'Set pythonpath'
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
+      - name: 'Install dependencies'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ${{ github.workspace }}/${{ inputs.appFolder }}/requirements.txt
+
+      - name: 'Install functtion App core tools'
+        shell: bash
+        run: |
+          func --version || {
+            sudo apt-get update
+            sudo apt-get install azure-functions-core-tools-4
+            }
+          
+      - name: 'Deploy Function App'
+        shell: bash
+        run: |
+          cd ${{ github.workspace }}/${{ inputs.appFolder }}
+          func azure functionapp publish ${{ inputs.functionAppName }} --python
