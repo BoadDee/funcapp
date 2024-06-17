@@ -3,7 +3,6 @@
 azure-functions==1.17.0
 azure-functions-worker
 numpy==1.26.2
-onnxruntime==1.10.0
 pip-requirements-parser==32.0.1
 toml==0.10.2
 yarl==1.9.3
