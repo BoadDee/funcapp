@@ -85,6 +85,10 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: 'Set pythonpath'
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
       - name: 'Install dependencies'
         run: |
           cd ${{ github.workspace }}/${{ inputs.appFolder }}
@@ -92,15 +96,7 @@ jobs:
           python -m pip install pipenv
           pipenv requirements > requirements.txt
           pip install -r requirements.txt
-
-      - name: 'Set pythonpath'
-        run: |
-          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
-
-      - name: 'Install dependencies'
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r ${{ github.workspace }}/${{ inputs.appFolder }}/requirements.txt
+  
 
       - name: 'Install functtion App core tools'
         shell: bash
