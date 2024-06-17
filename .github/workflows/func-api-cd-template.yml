@@ -74,7 +74,7 @@ jobs:
           $json = Get-Content $filepath | Out-String | ConvertFrom-Json
           $instrumentationKey = $instrumentationKey.replace('"', '')
           $json |%{ $_.value = $_.value.replace('<<INSTRUMENTATION_KEY>>', $instrumentationKey) 
-          $_.value = $_.value.replace('<<ENVIRONMENT>>', '${{ inputs.environment }}'') }
+          $_.value = $_.value.replace('<<ENVIRONMENT>>', '${{ inputs.environment }}') }
           $json | ConvertTo-Json -Depth 10 | Set-Content $filepath
 
           az account show
