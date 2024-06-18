@@ -45,4 +45,4 @@ $apiHeaders = @{
     'x-functions-key' = "$($key.default)"
 }
 
-Invoke-RestMethod -Uri $FunctionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File swagger.json
+Invoke-RestMethod -Uri $FunctionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
