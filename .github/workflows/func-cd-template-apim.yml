@@ -81,26 +81,26 @@ jobs:
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/$ {{ inputs.appFolder }}/GenerateSwagger.ps1 -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -sunscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            ${{ github.workspace }}/${{ inputs.appFolder }}/GenerateSwagger.ps1 -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -sunscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           azPSVersion: "latest"
 
       - name: 'Create API version'
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPIVersion.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }} -rg ${{ inputs.functionRg }}
+            ${{ github.workspace }}/${{ inputs.appFolder }}/CreateAPIVersion.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }} -rg ${{ inputs.functionRg }}
           azPSVersion: "latest"
 
       - name: 'Import API'
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/$ {{ inputs.appFolder }}/ImportAPIDefinition.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -openApiJson '${{ github.workspace }}/swagger.json' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }}
+            ${{ github.workspace }}/${{ inputs.appFolder }}/ImportAPIDefinition.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -api 'dre-api-${{ inputs.environment }}' -openApiJson '${{ github.workspace }}/swagger.json' -apiRevision ${{ inputs.buildNumber }} -func ${{ inputs.functionAppName }}
           azPSVersion: "latest"
 
       - name: 'Create Api backend'
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/$ {{ inputs.appFolder }}/CreateAPIBackend.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }} -policyxml '${{ github.workspace }}/$ {{ inputs.appFolder }}/apim-policy.xml' -api 'dre-api-${{ inputs.environment }}'
+            ${{ github.workspace }}/${{ inputs.appFolder }}/CreateAPIBackend.ps1 -apim ${{ inputs.apim }} -apimrg ${{ inputs.apimRg }} -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }} -policyxml '${{ github.workspace }}/$ {{ inputs.appFolder }}/apim-policy.xml' -api 'dre-api-${{ inputs.environment }}'
           azPSVersion: "latest"
