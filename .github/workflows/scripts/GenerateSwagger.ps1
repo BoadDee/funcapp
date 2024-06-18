@@ -39,10 +39,10 @@ $headers = @{
     'Authorization' = "bearer $($token.Token)"}
 
 $url = "https://management.azure.com/$subscriptionId/resourceGroups/$rg/providers/Microsoft.Web/sites/$func/functions/http_app_func/listKeys?api-version=2022-03-01"
-$keys = Invoke-RestMethod -Uri $url -Headers $headers -Method POST
+$key = Invoke-RestMethod -Uri $url -Headers $headers -Method POST
 Write-Host "Invoke rest method with convert to json and out to swagger file.."
 $apiHeaders = @{
-    'x-functions-key' = "$(keys.default)"
+    'x-functions-key' = "$($key.default)"
 }
 
 Invoke-RestMethod -Uri $functionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File "swagger.json"
