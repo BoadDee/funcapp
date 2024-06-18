@@ -81,7 +81,7 @@ jobs:
         uses: azure/powershell@v2
         with:
           inlineScript: |
-            ${{ github.workspace }}/${{ inputs.appFolder }}/GenerateSwagger.ps1 -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -sunscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            ${{ github.workspace }}/${{ inputs.appFolder }}/GenerateSwagger.ps1 -rg ${{ inputs.functionRg }} -func ${{ inputs.functionAppName }} -subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           azPSVersion: "latest"
 
       - name: 'Create API version'
