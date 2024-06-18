@@ -1,27 +1,21 @@
 
 {
-    "scriptFile": "__init__.py",
-    "bindings": [
-      {
-        "type": "cosmosDBTrigger",
-        "name": "docs",
-        "direction": "in",
-        "leaseCollectionName": "leases",
-        "connectionStringSetting": "MyCosmosDBConnectionString",
-        "databaseName": "testdb",
-        "collectionName": "testcol01",
-        "createLeaseCollectionIfNotExists": true
-      },
-      {
-        "direction": "out",
-        "type": "cosmosDB",
-        "name": "outdoc",
-        "databaseName": "testdb",
-        "collectionName": "testcol02",
-        "leaseCollectionName": "leases",
-        "createLeaseCollectionIfNotExists": true,
-        "connectionStringSetting": "MyCosmosDBConnectionString",
-        "createIfNotExists": true
-      }
-    ]
-  }
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
+    }
+  ]
+}

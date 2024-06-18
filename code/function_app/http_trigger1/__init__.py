@@ -1,37 +1,60 @@
 
 import logging
-import azure.functions as func
 import json
+import time
+import azure.functions as func
+from . import toolsA_F1 as tools
 
-def _rot13(c):
-    if 'A' <= c and c <= 'Z':
-        return chr((ord(c) - ord('A') + 13) % 26 + ord('A'))
-    if 'a' <= c and c <= 'z':
-        return chr((ord(c) - ord('a') + 13) % 26 + ord('a'))
-    return c
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    start = time.time()
+    logging.info('Python HTTP trigger function processed a request.')
 
-def process_rot13(s):
-    g = (_rot13(c) for c in s)
-    return ''.join(g)
+    try:
+        # Decode and return request body as JSON
+        req_body = req.get_json()
+    except ValueError:
+        numA, numB = None, None
+        pass
+    else:
+        numA = req_body.get('A')
+        numB = req_body.get('B')        
 
-def main(docs: func.DocumentList, outdoc: func.Out[func.Document]) -> str:
 
-    newdocs = func.DocumentList() 
-    for doc in docs:
-        logging.info(doc.to_json())
+    if numA and numB:
+        # Call Common Functions
+        sum1 = tools.sum1(numA, numB)
+        sub1 = tools.sub1(numA, numB)
+        pow1 = tools.pow1(numA, numB)
+        div1 = tools.div1(numA, numB)
 
-        ## Process Something
-        clear_text = doc["text"]
-        encrypted_text= process_rot13(clear_text)        
+        dt1 = time.time()-start
+        return func.HttpResponse(
+            json.dumps({
+                'method': req.method,
+                'url': req.url,
+                'headers': dict(req.headers),
+                'params': dict(req.params),
+                'get_body': req.get_body().decode(),
+                'timer': dt1,
+                'return': 'Function App recieved %s and %s' %({numA}, {numB}) ,
+                'Sum': sum1,
+                'Sub': sub1,
+                'Pow': pow1,
+                'Div': div1
+            })
+            )
 
-        ## Create a new doc (type:Dict)
-        newdoc_dict = {
-            "name": doc["name"],
-            "text": encrypted_text 
-        }
-
-        ## Append the new doc to DocumentList for output
-        newdocs.append(func.Document.from_dict(newdoc_dict))
- 
-    ## Set the DocumentList to outdoc to store into CosmosDB using CosmosDB output binding
-    outdoc.set(newdocs)
+    else:
+        dt1 = time.time()-start
+        return func.HttpResponse(
+            json.dumps({
+                'method': req.method,
+                'url': req.url,
+                'headers': dict(req.headers),
+                'params': dict(req.params),
+                'get_body': req.get_body().decode(),
+                'timer': dt1,
+                'return': 'Please pass numbers A,B to Function App in the request body'
+            })
+            , status_code=400
+        )

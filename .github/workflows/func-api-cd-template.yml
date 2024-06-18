@@ -96,7 +96,7 @@ jobs:
           pip install --only-binary :all: grpcio grpcio-tools
           pip install grpcio grpcio-tools
           pip install -r requirements.txt
-        continue-on-error: true
+        continue-on-error: false
 
         # cd ${{ github.workspace }}/${{ inputs.appFolder }}
           # python -m pip install --upgrade pip
@@ -118,4 +118,4 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.appFolder }}
           func azure functionapp publish ${{ inputs.functionAppName }} --python
-        continue-on-error: true
+        continue-on-error: false

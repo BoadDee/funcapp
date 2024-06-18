@@ -1,0 +1,14 @@
+
+{
+    // Created Local VENV by VS Code
+    "azureFunctions.pythonVenv": ".venv",
+    "python.pythonPath": ".venv\\Scripts\\python.exe",
+    // Local Machine Conda VENV (Define CONDAPATH in Windows Environment)
+    //"azureFunctions.pythonVenv": "%CONDAPATH%\\envs\\azure",
+    //"python.pythonPath": "%CONDAPATH%\\azure\\Scripts\\python.exe",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "func: pack",
+    "azureFunctions.deploySubpath": "FuncApp-Http-Py-OptionA.zip",
+  }
