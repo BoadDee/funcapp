@@ -38,7 +38,7 @@ $token = Get-AzAccessToken -ResourceUrl "https://management.azure.com/"
 $headers = @{
     'Authorization' = "bearer $($token.Token)"}
 
-$url = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$rg/providers/Microsoft.Web/sites/$func/functions/http_app_func/listKeys?api-version=2022-03-01"
+$url = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$rg/providers/Microsoft.Web/sites/$func/functions/http_trigger1/listKeys?api-version=2022-03-01"
 $key = Invoke-RestMethod -Uri $url -Headers $headers -Method POST
 Write-Host "Invoke rest method with convert to json and out to swagger file.."
 $apiHeaders = @{
