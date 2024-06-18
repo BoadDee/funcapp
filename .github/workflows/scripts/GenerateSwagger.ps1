@@ -28,21 +28,23 @@ $FunctionApp = Get-AzWebApp -ResourceGroupName $rg -Name $func
 $Id = $FunctionApp.Id
 Write-Host "Set Function URL properties.. Started"
 $DefaultHostName = $FunctionApp.DefaultHostName
-$FunctionURL = $DefaultHostName + "/openapi.json"
+$FunctionURL = $DefaultHostName + "/api/openapi.json"
 Write-Host "Swagger url:  $FunctionURL"
 
-Write-host "Get Function App ID.. Completed"
-Write-Host "Set Function App URL properties.. Started"
-$FunctionKey = (Invoke-AzResourceAction -ResourceId "$Id/host/default" -Action listKeys -Force).functionKeys.default
-$token = Get-AzAccessToken -ResourceUrl "https://management.azure.com/"
-$headers = @{
-    'Authorization' = "bearer $($token.Token)"}
+# Write-host "Get Function App ID.. Completed"
+# Write-Host "Set Function App URL properties.. Started"
+# $FunctionKey = (Invoke-AzResourceAction -ResourceId "$Id/host/default" -Action listKeys -Force).functionKeys.default
+# $token = Get-AzAccessToken -ResourceUrl "https://management.azure.com/"
+# $headers = @{
+#     'Authorization' = "bearer $($token.Token)"}
 
-$url = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$rg/providers/Microsoft.Web/sites/$func/functions/http_trigger1/listKeys?api-version=2022-03-01"
-$key = Invoke-RestMethod -Uri $url -Headers $headers -Method POST
+# $url = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$rg/providers/Microsoft.Web/sites/$func/functions/http_trigger1/listKeys?api-version=2022-03-01"
+# $key = Invoke-RestMethod -Uri $url -Headers $headers -Method POST
 Write-Host "Invoke rest method with convert to json and out to swagger file.."
-$apiHeaders = @{
-    'x-functions-key' = "$($key.default)"
-}
+# $apiHeaders = @{
+#     'x-functions-key' = "$($key.default)"
+# }
 
-Invoke-RestMethod -Uri $FunctionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
+# Invoke-RestMethod -Uri $FunctionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
+
+Invoke-RestMethod -Uri $FunctionURL -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
