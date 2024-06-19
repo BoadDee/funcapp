@@ -28,7 +28,7 @@ $FunctionApp = Get-AzWebApp -ResourceGroupName $rg -Name $func
 $Id = $FunctionApp.Id
 Write-Host "Set Function URL properties.. Started"
 $DefaultHostName = $FunctionApp.DefaultHostName
-$FunctionURL = $DefaultHostName + "/api/openapi.json"
+$FunctionURL = $DefaultHostName + "/openapi.json"
 Write-Host "Swagger url:  $FunctionURL"
 
 # Write-host "Get Function App ID.. Completed"
