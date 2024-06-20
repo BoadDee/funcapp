@@ -28,8 +28,11 @@ $FunctionApp = Get-AzWebApp -ResourceGroupName $rg -Name $func
 $Id = $FunctionApp.Id
 Write-Host "Set Function URL properties.. Started"
 $DefaultHostName = $FunctionApp.DefaultHostName
-$FunctionURL = $DefaultHostName + "/openapi.json"
+$FunctionURL = $DefaultHostName + "/swagger/v1/swagger.json"
 Write-Host "Swagger url:  $FunctionURL"
+
+Invoke-RestMethod -Uri $FunctionURL -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
+
 
 # Write-host "Get Function App ID.. Completed"
 # Write-Host "Set Function App URL properties.. Started"
@@ -47,4 +50,4 @@ Write-Host "Invoke rest method with convert to json and out to swagger file.."
 
 # Invoke-RestMethod -Uri $FunctionURL -Headers $apiHeaders -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
 
-Invoke-RestMethod -Uri $FunctionURL -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
+# Invoke-RestMethod -Uri $FunctionURL -Method GET | ConvertTo-Json -Depth 100 | Out-File Swagger.json
