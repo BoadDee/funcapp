@@ -6,7 +6,9 @@
     },
     "extensions": {
         "http": {
-            "routePrefix": ""
+            "routePrefix": "swagger"
+            
+            }
         }
-    }
+
 }
